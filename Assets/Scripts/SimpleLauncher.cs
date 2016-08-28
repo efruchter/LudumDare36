@@ -10,6 +10,7 @@ public class SimpleLauncher : MonoBehaviour {
 	}
 	
 	IEnumerator RunRoutine() {
+		yield return null;
 		yield return new WaitForSeconds( startup );
 
 		while ( true ) {
