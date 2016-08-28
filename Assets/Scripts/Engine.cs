@@ -106,6 +106,7 @@ public class Engine : MonoBehaviour {
 		cameraController.alpha = 0;
 
 		I.playerBundle.player.gameObject.SetActive( false );
+		Time.timeScale = 0;
 
 		SceneManager.LoadScene(level , LoadSceneMode.Single );
 		yield return null;
@@ -116,6 +117,7 @@ public class Engine : MonoBehaviour {
 		System.GC.Collect();
 
 		StartCoroutine( I.OnSpawnRoutine() );
+		Time.timeScale = 1;
 	}
 
 	public static void PlaySound ( AudioClip clip, float volume = 1f ) {
