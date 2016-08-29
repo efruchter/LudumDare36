@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System;
 
 public class Engine : MonoBehaviour {
 	private static Engine I;
@@ -15,6 +16,11 @@ public class Engine : MonoBehaviour {
 		get {
 			return I.playerBundle.player;
 		}
+	}
+
+	public static void AllowReflect () {
+		I.playerBundle.player.CanReflect = true;
+		PlayerPrefs.SetInt( "reflect", 1 );
 	}
 
 	public PlayerBundle playerBundle;
@@ -50,6 +56,7 @@ public class Engine : MonoBehaviour {
 		}
 		cameraController.alpha = 1;
 		I.playerBundle.player.AllowControl = true;
+		Player.CanReflect = PlayerPrefs.GetInt( "reflect", 0 ) > 0;
 	}
 
 	public static void HitPause () {
@@ -84,7 +91,13 @@ public class Engine : MonoBehaviour {
 	}
 
 	public static void NextLevel () {
-		int level = SceneManager.GetActiveScene ().buildIndex + 1;
+		if (SceneManager.GetActiveScene().buildIndex == 0) {
+			PlayerPrefs.SetInt( "reflect", 0 );
+		}
+		int level = 0;
+		if (SceneManager.GetActiveScene().buildIndex < SceneManager.sceneCountInBuildSettings - 1) {
+			level = SceneManager.GetActiveScene().buildIndex + 1;
+        }
 		I.StartCoroutine (I.NextLevelRoutine (level));
 		PlayerPrefs.SetInt ("level", level);
 	}

@@ -36,6 +36,14 @@ public abstract class Projectile : MonoBehaviour, Poolable {
 					Reflect( _circleCastArray[ i ].collider );
 				}
 			}
+		} else {
+			for ( int i = 0; i < collisions; i++ ) {
+				if ( _circleCastArray[ i ].collider.gameObject.layer == Constants.EnemyLayer ) {
+					_circleCastArray[ i ].collider.gameObject.GetComponent<BossScarab>().TakeDamage();
+                    WallCollision();
+					return;
+				}
+			}
 		}
 
 		if ( !reflected ) {

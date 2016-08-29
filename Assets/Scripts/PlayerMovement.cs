@@ -8,15 +8,17 @@ public class PlayerMovement : MonoBehaviour {
 	public Animator animator;
 	public SpriteMirror spriteMirror;
 	public ParticleSystem featherParticle;
-	public AudioClip jumpClip, deathClip;
+	public AudioClip jumpClip, deathClip, reflectClip;
 
 	Collider2D[] colliders;
 
 	float maxJumpTime = 2f, maxReflectTime = 0.2f;
-	float jumpTimeRemaining;
+	float jumpTimeRemaining, reflectTimeRemaining;
 	bool jumping, reflecting, frozen;
 	bool wasOnGround;
-	public bool Alive {private set; get;}
+	public bool Alive { private set; get; }
+	[System.NonSerialized]
+	public bool CanReflect;
 
 	public bool AllowControl {
 		set {
@@ -27,29 +29,29 @@ public class PlayerMovement : MonoBehaviour {
 	void Awake () {
 		Application.targetFrameRate = 60;
 		reflector.SetActive( false );
-		colliders = GetComponents<Collider2D> ();
+		colliders = GetComponents<Collider2D>();
 	}
 
-	public void OnRespawn() {
+	public void OnRespawn () {
 		frozen = false;
 		jumping = false;
 		reflecting = false;
 		Alive = true;
 
 		body.isKinematic = true;
-		transform.position = ( Vector2 ) GameObject.FindObjectOfType<StartingPosition>().transform.position + new Vector2(0, 8);
+		transform.position = ( Vector2 ) GameObject.FindObjectOfType<StartingPosition>().transform.position + new Vector2( 0, 8 );
 		body.isKinematic = false;
 		body.velocity = Vector2.zero;
 
-		for (int i = 0; i < colliders.Length; i++) {
-			colliders [i].enabled = true;
+		for ( int i = 0; i < colliders.Length; i++ ) {
+			colliders[ i ].enabled = true;
 		}
 
-		animator.SetBool ("dead", false);
+		animator.SetBool( "dead", false );
 	}
 
-	public void OnDeath() {
-		StopAllCoroutines ();
+	public void OnDeath () {
+		StopAllCoroutines();
 
 		Alive = false;
 		frozen = true;
@@ -57,9 +59,9 @@ public class PlayerMovement : MonoBehaviour {
 		reflecting = false;
 
 		reflector.SetActive( false );
-		animator.SetBool ("dead", true);
+		animator.SetBool( "dead", true );
 
-		body.velocity = new Vector2 (0f, 128);
+		body.velocity = new Vector2( 0f, 128 );
 
 		Engine.PlaySound( deathClip );
 	}
@@ -91,17 +93,20 @@ public class PlayerMovement : MonoBehaviour {
 			animator.SetTrigger( "landing" );
 		}
 
-		if (jumpSensor.OnGround) {
+		if ( jumpSensor.OnGround ) {
 			jumpTimeRemaining = maxJumpTime;
+			if ( !reflecting ) {
+				reflectTimeRemaining = maxReflectTime;
+			}
 		}
 
 		if ( Mathf.Abs( Input.GetAxisRaw( "Horizontal" ) ) > 0.01f ) {
 			spriteMirror.SetFacing( Input.GetAxisRaw( "Horizontal" ) > 0 );
 		}
 
-		/*if ( Input.GetButtonDown( "Fire2" ) && !reflecting ) {
+		if ( CanReflect && Input.GetButtonDown( "Action" ) && !reflecting ) {
 			StartCoroutine( ReflectRoutine() );
-		}*/
+		}
 
 		if ( Input.GetButtonDown( "Jump" ) && !jumping ) {
 			StartCoroutine( JumpRoutine() );
@@ -111,9 +116,12 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	IEnumerator ReflectRoutine () {
+		if ( reflectTimeRemaining <= 0 ) {
+			yield break;
+		}
 		reflecting = true;
 		reflector.SetActive( true );
-		float reflectTimeRemaining = maxReflectTime;
+		Engine.PlaySound( reflectClip );
 		while ( reflectTimeRemaining >= 0 ) {
 			reflectTimeRemaining -= Time.deltaTime;
 			body.velocity = Vector2.zero;
@@ -125,7 +133,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	IEnumerator JumpRoutine () {
 		Engine.PlaySound( jumpClip, Mathf.Clamp01( jumpTimeRemaining / maxJumpTime ) );
-		featherParticle.startColor = Color.Lerp (Color.grey, Color.white, Mathf.Clamp01 (jumpTimeRemaining / maxJumpTime)); 
+		featherParticle.startColor = Color.Lerp( Color.grey, Color.white, Mathf.Clamp01( jumpTimeRemaining / maxJumpTime ) );
 		animator.SetTrigger( "jump" );
 		featherParticle.Emit( 1 );
 		jumping = true;
