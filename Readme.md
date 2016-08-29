@@ -7,4 +7,5 @@ Attributions:
 
 * Sounds: Mario Land (GB)
 * Hieroglyph Background: Andor Salga
+* Cairo photo: The Telegraph UK
 * Everything else: Eric Fruchter
