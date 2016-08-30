@@ -7,13 +7,19 @@ A 2D skill-based platformer where you play as a chicken that must steal ancient 
 Controller is absolutely recommended. 
 
 Controls (Controller): 
+
 Left-Stick: Move 
+
 Button 1: Jump and hold to sustain flight 
+
 Button 2: Secret Action (You'll know when to press it!) 
 
-Controls (Keyboard): 
+Controls (Keyboard):
+
 WASD: Move 
+
 Left-Click: Jump and hold to sustain flight 
+
 Right-Click: Secret Action (You'll know when to press it!) 
 
 Tip: Try tapping Jump + a direction to move. You can hold Jump down to perform maneuvers. Have fun!
